@@ -182,7 +182,7 @@ L<Dancer::Plugin::DataFu>
 
 =head1 AUTHOR
 
-Peter Mottram (SysPete), C<< <peter@syxni.com> >>
+Peter Mottram (SysPete), C<< <peter@sysnix.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -55,7 +55,7 @@ A hash reference with the following keys is returned:
 
 ## RULES FILE
 
-The rules file format allows the &lt;/validator> to be configured using
+The rules file format allows the ["validator"](#validator) to be configured using
 all options available in [Data::Transpose::Validator](https://metacpan.org/pod/Data::Transpose::Validator), for example:
 
 ```perl
@@ -145,7 +145,7 @@ of aspects of this plugin.
 
 # AUTHOR
 
-Peter Mottram (SysPete), `<peter@syxni.com>`
+Peter Mottram (SysPete), `<peter@sysnix.com>`
 
 # COPYRIGHT AND LICENSE
 

@@ -48,7 +48,7 @@ FUNCTIONS
         "css_error_class" in "CONFIGURATION".
 
   RULES FILE
-    The rules file format allows the </validator> to be configured using all
+    The rules file format allows the "validator" to be configured using all
     options available in Data::Transpose::Validator, for example:
 
         options => {
@@ -132,7 +132,7 @@ SEE ALSO
     Dancer::Plugin::DataFu
 
 AUTHOR
-    Peter Mottram (SysPete), "<peter@syxni.com>"
+    Peter Mottram (SysPete), "<peter@sysnix.com>"
 
 COPYRIGHT AND LICENSE
     Copyright 2015 Peter Mottram (SysPete).
