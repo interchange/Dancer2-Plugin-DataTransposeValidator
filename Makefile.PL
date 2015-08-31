@@ -14,6 +14,7 @@ WriteMakefile(
         'Email::Valid'          => 0,
         'File::Spec'            => 0,
         'HTTP::Request::Common' => 0,
+        'JSON'                  => 0,
         'Plack::Builder'        => 0,
         'Plack::Test'           => 0,
         'Test::Deep'            => 0,
