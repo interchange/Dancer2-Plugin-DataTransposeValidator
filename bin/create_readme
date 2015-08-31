@@ -1,1 +1,2 @@
+perl -MPod::Markdown::Github -e "Pod::Markdown::Github->filter('lib/Dancer/Plugin/DataTransposeValidator.pm')" > README.md
 perldoc -t lib/Dancer/Plugin/DataTransposeValidator.pm > README
