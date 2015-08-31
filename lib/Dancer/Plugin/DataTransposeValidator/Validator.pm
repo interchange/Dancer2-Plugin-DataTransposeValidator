@@ -140,7 +140,9 @@ sub transpose {
     my $dtv = Data::Transpose::Validator->new(%$options);
     $dtv->prepare(%$prepare);
 
-    my $clean = $dtv->transpose( $self->params );
+    my $params = $self->params;
+
+    my $clean = $dtv->transpose( $params );
     my $ret;
 
     if ($clean) {
@@ -153,7 +155,7 @@ sub transpose {
 
         my $errors_hash = $self->plugin_setting->{errors_hash};
 
-        my $v_hash = $validator->errors_hash;
+        my $v_hash = $dtv->errors_hash;
         while ( my ( $key, $value ) = each %$v_hash ) {
 
             $ret->{css}->{$key} = 'has-error';
@@ -161,7 +163,7 @@ sub transpose {
             my @errors = map { $_->{value} } @{$value};
 
             if ( $errors_hash && $errors_hash eq 'joined' ) {
-                $ret->{errors}->{$key} = join(". ", @errors);
+                $ret->{errors}->{$key} = join( ". ", @errors );
             }
             elsif ( $errors_hash && $errors_hash eq 'arrayref' ) {
                 $ret->{errors}->{$key} = \@errors;
@@ -171,6 +173,7 @@ sub transpose {
             }
         }
     }
+    return $ret;
 }
 
 1;
