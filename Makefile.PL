@@ -22,6 +22,7 @@ WriteMakefile(
         'Test::More'            => 0,
     },
     PREREQ_PM => {
+        'Dancer'           => 0,
         'Data::Transpose'  => '0.0020',
         'Moo'              => 0,
         'namespace::clean' => 0,
