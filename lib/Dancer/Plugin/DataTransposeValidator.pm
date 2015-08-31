@@ -156,7 +156,7 @@ This can has a number of different values:
 
 A false value (the default) means that only a single scalar error string will
 be returned for each parameter error. This will be the first error returned
-for the paramater by L<Data::Transpose::Validator/errors_hash>.
+for the parameter by L<Data::Transpose::Validator/errors_hash>.
 
 =item * joined
 

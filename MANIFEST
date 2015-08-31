@@ -8,3 +8,4 @@ lib/Dancer/Plugin/DataTransposeValidator/Validator.pm
 t/author/manifest.t
 t/author/pod.t
 t/author/pod-coverage.t
+t/author/pod-spelling.t
