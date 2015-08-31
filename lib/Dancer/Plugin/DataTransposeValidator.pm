@@ -88,7 +88,7 @@ L</CONFIGURATION>.
 
 =head2 RULES FILE
 
-The rules file format allows the </validator> to be configured using
+The rules file format allows the L</validator> to be configured using
 all options available in L<Data::Transpose::Validator>, for example:
 
     options => {
