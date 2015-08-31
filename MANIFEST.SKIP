@@ -1,2 +1,8 @@
+^\.git\/
+^.*\.tar.gz$
+^.*.bak
+^.*.old
+.gitignore
+.travis.yml
 bin/*
 README.md
