@@ -2,18 +2,18 @@ sudo: false
 env: RELEASE_TESTING=1
 language: perl
 perl:
-  - "5.8"
-  - "5.10"
-  - "5.12"
-  - "5.14"
-  - "5.16"
-  - "5.18"
   - "5.20"
-  - "5.22"
-  - "dev"
-  - "blead"
+#  - "5.8"
+#  - "5.10"
+#  - "5.12"
+#  - "5.14"
+#  - "5.16"
+#  - "5.18"
+#  - "5.22"
+#  - "dev"
+#  - "blead"
 install:
-  - cpanm --quiet --notest Test::CheckManifest
+  - cpanm --quiet --notest Dancer Test::CheckManifest Test::Spelling Pod::Coverage Test::Pod::Coverage
   - cpanm --quiet --installdeps --notest .
 matrix:
   allow_failures:
