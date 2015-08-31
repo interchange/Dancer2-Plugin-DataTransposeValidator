@@ -56,36 +56,39 @@ A hash reference with the following keys is returned:
 ## RULES FILE
 
 The rules file format allows the ["validator"](#validator) to be configured using
-all options available in [Data::Transpose::Validator](https://metacpan.org/pod/Data::Transpose::Validator), for example:
+all options available in [Data::Transpose::Validator](https://metacpan.org/pod/Data::Transpose::Validator). The rules file
+must contain a valid hash reference, e.g.: 
 
 ```perl
-options => {
-    stripwhite => 1,
-    collapse_whitespace => 1,
-    requireall => 0,
-    unknown => fail,
-    missing => undefine,
-},
-prepare => {
-    email => {
-        validator => "EmailValid",
-        required => 1,
+{
+    options => {
+        stripwhite => 1,
+        collapse_whitespace => 1,
+        requireall => 0,
+        unknown => fail,
+        missing => undefine,
     },
-    email2 => {
-        validator => {
-            class => "MyValidator::EmailValid",
-            absolute => 1,
-        }
-    },
-    field4 => {
-        validator => {
-            sub {
-                my $field = shift;
-                if ( $field =~ /^\d+/ && $field > 0 ) {
-                    return 1;
-                }
-                else {
-                    return ( undef, "Not a positive integer" );
+    prepare => {
+        email => {
+            validator => "EmailValid",
+            required => 1,
+        },
+        email2 => {
+            validator => {
+                class => "MyValidator::EmailValid",
+                absolute => 1,
+            }
+        },
+        field4 => {
+            validator => {
+                sub {
+                    my $field = shift;
+                    if ( $field =~ /^\d+/ && $field > 0 ) {
+                        return 1;
+                    }
+                    else {
+                        return ( undef, "Not a positive integer" );
+                    }
                 }
             }
         }
@@ -93,7 +96,7 @@ prepare => {
 }
 ```
 
-Note that the value of the `prepare` key must be a hash reference and the
+Note that the value of the `prepare` key must be a hash reference since the
 array reference form of ["prepare" in Data::Transpose::Validator](https://metacpan.org/pod/Data::Transpose::Validator#prepare) is not supported.
 
 # CONFIGURATION
