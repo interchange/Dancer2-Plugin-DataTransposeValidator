@@ -8,7 +8,9 @@ WriteMakefile(
     ( $ExtUtils::MakeMaker::VERSION >= 6.47
         ? ( 'LICENSE' => 'perl' )
         : () ),
-    BUILD_REQUIRES => {
+    MIN_PERL_VERSION => '5.010000',
+    BUILD_REQUIRES   => {
+        'aliased'         => 0,
         'Test::Exception' => 0,
         'Test::More'      => 0,
     },
