@@ -8,8 +8,11 @@ WriteMakefile(
     ( $ExtUtils::MakeMaker::VERSION >= 6.47
         ? ( 'LICENSE' => 'perl' )
         : () ),
-    BUILD_REQUIRES => {},
-    PREREQ_PM      => {
+    BUILD_REQUIRES => {
+        'Test::Exception' => 0,
+        'Test::More'      => 0,
+    },
+    PREREQ_PM => {
         'Data::Transpose'  => '0.0020',
         'Moo'              => 0,
         'namespace::clean' => 0,
