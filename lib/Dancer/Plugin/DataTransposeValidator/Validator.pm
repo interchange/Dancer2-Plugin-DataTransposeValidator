@@ -119,7 +119,7 @@ has rules => (
 sub _build_rules {
     my $self  = shift;
     my $path  = path( $self->rules_dir, $self->rules_file );
-    my $rules = do $path or die "$!\n$@";
+    my $rules = do $path or die "bad rules file: $path - $! $@";
     return $rules;
 }
 
@@ -142,7 +142,7 @@ sub transpose {
 
     my $params = $self->params;
 
-    my $clean = $dtv->transpose( $params );
+    my $clean = $dtv->transpose($params);
     my $ret;
 
     if ($clean) {
@@ -158,7 +158,7 @@ sub transpose {
         my $v_hash = $dtv->errors_hash;
         while ( my ( $key, $value ) = each %$v_hash ) {
 
-            $ret->{css}->{$key} = 'has-error';
+            $ret->{css}->{$key} = $self->css_error_class;
 
             my @errors = map { $_->{value} } @{$value};
 

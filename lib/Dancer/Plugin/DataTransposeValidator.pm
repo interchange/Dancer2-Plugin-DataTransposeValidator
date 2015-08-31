@@ -19,14 +19,12 @@ Version 0.001
 
 our $VERSION = '0.001';
 
-my $settings = plugin_setting;
-
 register validator => sub {
     my ( $params, $rules_file ) = @_;
 
     Validator->new(
         params         => $params,
-        plugin_setting => $settings,
+        plugin_setting => plugin_setting,
         rules_file     => $rules_file
     )->transpose;
 };
@@ -97,8 +95,8 @@ must contain a valid hash reference, e.g.:
             stripwhite => 1,
             collapse_whitespace => 1,
             requireall => 0,
-            unknown => fail,
-            missing => undefine,
+            unknown => "fail",
+            missing => "undefine",
         },
         prepare => {
             email => {

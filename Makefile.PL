@@ -10,9 +10,15 @@ WriteMakefile(
         : () ),
     MIN_PERL_VERSION => '5.010000',
     BUILD_REQUIRES   => {
-        'aliased'         => 0,
-        'Test::Exception' => 0,
-        'Test::More'      => 0,
+        'aliased'               => 0,
+        'Email::Valid'          => 0,
+        'File::Spec'            => 0,
+        'HTTP::Request::Common' => 0,
+        'Plack::Builder'        => 0,
+        'Plack::Test'           => 0,
+        'Test::Deep'            => 0,
+        'Test::Exception'       => 0,
+        'Test::More'            => 0,
     },
     PREREQ_PM => {
         'Data::Transpose'  => '0.0020',
