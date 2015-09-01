@@ -98,6 +98,20 @@ sub from_json {
         content_type('application/json');
         return to_json($data);
     };
+
+    post '/coderef1' => sub {
+        my $params = params;
+        my $data = validator( $params, 'coderef1', 'String' );
+        content_type('application/json');
+        return to_json($data);
+    };
+
+    post '/coderef2' => sub {
+        my $params = params;
+        my $data = validator( $params, 'coderef1', 'EmailValid' );
+        content_type('application/json');
+        return to_json($data);
+    };
 }
 
 my ( $data, $expected, $req, $res );
@@ -247,6 +261,54 @@ $expected = {
         foo      => "bar",
         email    => 'user@example.com',
         password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+    }
+};
+$data = from_json( $res->content );
+cmp_deeply( $data, $expected, "good result" );
+
+# coderef with foo validated as String
+$req = POST "$uri/coderef1",
+  [
+    foo      => "bar",
+    email    => 'user@example.com',
+    password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+  ];
+$res = $test->request($req);
+ok( $res->is_success, "coderef rules foo String" );
+
+$expected = {
+    valid  => 1,
+    values => {
+        foo      => "bar",
+        email    => 'user@example.com',
+        password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+    }
+};
+$data = from_json( $res->content );
+cmp_deeply( $data, $expected, "good result" );
+
+# coderef with foo validated as String
+$req = POST "$uri/coderef2",
+  [
+    foo      => "bar",
+    email    => 'user@example.com',
+    password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+  ];
+$res = $test->request($req);
+ok( $res->is_success, "coderef rules foo EmailValid" );
+
+$expected = {
+    css => {
+        foo => "has-error"
+    },
+    errors => {
+        foo => "rfc822"
+    },
+    valid  => 0,
+    values => {
+        email    => "user\@example.com",
+        foo      => "bar",
+        password => "cA\$(!n6K)Y.zoKoqayL}\$O6EY}Q+g"
     }
 };
 $data = from_json( $res->content );

@@ -20,13 +20,14 @@ Version 0.002
 our $VERSION = '0.002';
 
 register validator => sub {
-    my ( $params, $rules_file ) = @_;
+    my ( $params, $rules_file, @additional_args ) = @_;
 
     Validator->new(
-        appdir         => setting('appdir'),
-        params         => $params,
-        plugin_setting => plugin_setting,
-        rules_file     => $rules_file
+        additional_args => @additional_args ? [@additional_args] : [],
+        appdir          => setting('appdir'),
+        params          => $params,
+        plugin_setting  => plugin_setting,
+        rules_file      => $rules_file
     )->transpose;
 };
 
@@ -54,10 +55,11 @@ Dancer plugin for for L<Data::Transpose::Validator>
 
 This module exports the single function C<validator>.
 
-=head2 validator( $params, $rules_file )
+=head2 validator( $params, $rules_file, @additional_args )
 
 Arguments should be a hash reference of parameters to be validated and the
-name of the rules file to use.
+name of the rules file to use. Any C<@additional_args> are passed as arguments
+to the rules file B<only> if it is a code reference. See L</RULES FILE>.
 
 A hash reference with the following keys is returned:
 
@@ -128,6 +130,31 @@ must contain a valid hash reference, e.g.:
 
 Note that the value of the C<prepare> key must be a hash reference since the
 array reference form of L<Data::Transpose::Validator/prepare> is not supported.
+
+As an alternative the rules file can contain a code reference, e.g.:
+
+    sub {
+        my $username = shift;
+        return {
+            options => {
+                stripwhite => 1,
+            },
+            prepare => {
+                password => {
+                    validator => {
+                        class => 'PasswordPolicy',
+                        options => {
+                            username  => $username,
+                            minlength => 8,
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+The code reference receives the C<@additional_args> passed to L</validator>.
+The code reference must return a valid hash reference.
 
 =head1 CONFIGURATION
 

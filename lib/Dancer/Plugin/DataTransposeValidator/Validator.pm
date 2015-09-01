@@ -12,6 +12,21 @@ Dancer::Plugin::DataTransposeValidator
 
 =head1 METHODS
 
+=head2 additional_args
+
+Any additional arguments passed in to validator are passed as arguments
+to L</rules_file> if it contains a code reference.
+
+=cut
+
+has additional_args => (
+    is => 'ro',
+    isa => sub {
+        die "params must be as array reference" unless ref( $_[0] ) eq 'ARRAY';
+    },
+    default => sub { [] },
+);
+
 =head2 appdir
 
 Dancer's appdir. Required.
@@ -134,6 +149,9 @@ sub _build_rules {
     my $self  = shift;
     my $path  = File::Spec->catfile( $self->rules_dir, $self->rules_file );
     my $rules = do $path or die "bad rules file: $path - $! $@";
+    if ( ref($rules) eq 'CODE' ) {
+        return $rules->( @{ $self->additional_args } );
+    }
     return $rules;
 }
 
