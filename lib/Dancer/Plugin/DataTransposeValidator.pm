@@ -13,11 +13,11 @@ Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for D
 
 =head1 VERSION
 
-Version 0.002
+Version 0.003
 
 =cut
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 register validator => sub {
     my ( $params, $rules_file, @additional_args ) = @_;

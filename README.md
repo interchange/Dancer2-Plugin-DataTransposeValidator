@@ -4,7 +4,7 @@ Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for D
 
 # VERSION
 
-Version 0.002
+Version 0.003
 
 # SYNOPSIS
 
@@ -26,10 +26,11 @@ Dancer plugin for for [Data::Transpose::Validator](https://metacpan.org/pod/Data
 
 This module exports the single function `validator`.
 
-## validator( $params, $rules\_file )
+## validator( $params, $rules\_file, @additional\_args )
 
 Arguments should be a hash reference of parameters to be validated and the
-name of the rules file to use.
+name of the rules file to use. Any `@additional_args` are passed as arguments
+to the rules file **only** if it is a code reference. See ["RULES FILE"](#rules-file).
 
 A hash reference with the following keys is returned:
 
@@ -98,6 +99,33 @@ must contain a valid hash reference, e.g.:
 
 Note that the value of the `prepare` key must be a hash reference since the
 array reference form of ["prepare" in Data::Transpose::Validator](https://metacpan.org/pod/Data::Transpose::Validator#prepare) is not supported.
+
+As an alternative the rules file can contain a code reference, e.g.:
+
+```perl
+sub {
+    my $username = shift;
+    return {
+        options => {
+            stripwhite => 1,
+        },
+        prepare => {
+            password => {
+                validator => {
+                    class => 'PasswordPolicy',
+                    options => {
+                        username  => $username,
+                        minlength => 8,
+                    }
+                }
+            }
+        }
+    };
+}
+```
+
+The code reference receives the `@additional_args` passed to ["validator"](#validator).
+The code reference must return a valid hash reference.
 
 # CONFIGURATION
 
