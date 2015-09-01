@@ -6,11 +6,15 @@ use Test::More import => ['!pass'];
 use Test::Deep;
 use Test::Exception;
 
+use Class::Load qw/try_load_class/;
 use File::Spec;
 use HTTP::Request::Common;
 use JSON qw//;
 use Plack::Builder;
 use Plack::Test;
+
+try_load_class('Dancer2')
+  or plan skip_all => "Dancer2 required to run these tests";
 
 sub from_json {
     return JSON::from_json(shift);
