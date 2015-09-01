@@ -10,5 +10,5 @@ perl:
   - "5.20"
   - "5.21"
 install:
-  - cpanm --quiet --notest Dancer Test::CheckManifest Test::Spelling Pod::Coverage Test::Pod::Coverage
+  - cpanm --quiet --notest Dancer Dancer2 Test::CheckManifest Test::Spelling Pod::Coverage Test::Pod::Coverage
   - cpanm --quiet --installdeps --notest .

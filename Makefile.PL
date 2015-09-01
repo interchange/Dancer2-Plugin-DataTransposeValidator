@@ -1,11 +1,24 @@
 use ExtUtils::MakeMaker;
 
+my $PREREQ_PM = {
+    'Data::Transpose'  => '0.0020',
+    'Moo'              => 0,
+    'namespace::clean' => 0,
+};
+
+# we are for D1 and D2 and don't want to force users to have both but we
+# do want smokers to test on both
+if ( $ENV{AUTOMATED_TESTING} || $ENV{TRAVIS} eq 'true' ) {
+    $PREREQ_PM->{Dancer} = 0;
+    $PREREQ_PM->{Dancer2} = 0;
+}
+
 WriteMakefile(
     NAME          => 'Dancer::Plugin::DataTransposeValidator',
     AUTHOR        => 'Peter Mottram <peter@sysnix.com>',
     VERSION_FROM  => 'lib/Dancer/Plugin/DataTransposeValidator.pm',
-    ABSTRACT_FROM => 'lib/Dancer/Plugin/DataTransposeValidator.pm',
-    ( $ExtUtils::MakeMaker::VERSION >= 6.47
+    ABSTRACT      => 'Data::Transpose::Validator plugin for Dancer and Dancer2',
+    ( $ExtUtils::MakeMaker::VERSION >= 6.48
         ? ( 'LICENSE' => 'perl' )
         : () ),
     MIN_PERL_VERSION => '5.010000',
@@ -21,13 +34,8 @@ WriteMakefile(
         'Test::Exception'       => 0,
         'Test::More'            => 0,
     },
-    PREREQ_PM => {
-        'Dancer'           => 0,
-        'Data::Transpose'  => '0.0020',
-        'Moo'              => 0,
-        'namespace::clean' => 0,
-    },
-    dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    PREREQ_PM => $PREREQ_PM,
+    dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Dancer-Plugin-DataTransposeValidator-*' },
     test  => { TESTS => join( ' ', ( glob('t/*.t'), glob('t/*/*.t') ) ) },
     META_MERGE => {

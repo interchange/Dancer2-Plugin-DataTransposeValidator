@@ -1,18 +1,32 @@
-package    # hide from PAUSE
-  Dancer::Plugin::DataTransposeValidator::Validator;
+package Dancer::Plugin::DataTransposeValidator::Validator;
 
-use Dancer qw/path setting/;
 use Data::Transpose::Validator;
+use File::Spec;
 use Moo;
 use namespace::clean;
 
 =head1 NAME
 
-Dancer::Plugin::DataTransposeValidator::Validator - validator class for use
-by Dancer::Plugin::DataTransposeValidator
-and Dancer2::Plugin::DataTransposeValidator
+Dancer::Plugin::DataTransposeValidator::Validator - validator class for
+Dancer::Plugin::DataTransposeValidator
 
 =head1 METHODS
+
+=head2 appdir
+
+Dancer's appdir. Required.
+
+=cut
+
+has appdir => (
+    is  => 'ro',
+    isa => sub {
+        die "appdir must be a valid string"
+          unless ( defined $_[0] && $_[0] =~ /\S/ );
+        die "appdir must be a valid directory" unless -d $_[0];
+    },
+    required => 1,
+);
 
 =head2 css_error_class
 
@@ -84,7 +98,7 @@ sub _build_rules_dir {
       defined $self->plugin_setting->{rules_dir}
       ? $self->plugin_setting->{rules_dir}
       : 'validation';
-    return path( setting('appdir'), $dir );
+    return File::Spec->catdir( $self->appdir, $dir );
 }
 
 =head2 rules_file
@@ -118,7 +132,7 @@ has rules => (
 
 sub _build_rules {
     my $self  = shift;
-    my $path  = path( $self->rules_dir, $self->rules_file );
+    my $path  = File::Spec->catfile( $self->rules_dir, $self->rules_file );
     my $rules = do $path or die "bad rules file: $path - $! $@";
     return $rules;
 }

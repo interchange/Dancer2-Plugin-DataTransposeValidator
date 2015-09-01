@@ -1,15 +1,15 @@
-package Dancer::Plugin::DataTransposeValidator;
+package Dancer2::Plugin::DataTransposeValidator;
 
 use strict;
 use warnings;
 
-use Dancer ':syntax';
-use Dancer::Plugin;
+use Dancer2 ':syntax';
+use Dancer2::Plugin;
 use aliased 'Dancer::Plugin::DataTransposeValidator::Validator';
 
 =head1 NAME
 
-Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for Dancer
+Dancer2::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for Dancer2
 
 =head1 VERSION
 
@@ -20,10 +20,10 @@ Version 0.001
 our $VERSION = '0.001';
 
 register validator => sub {
-    my ( $params, $rules_file ) = @_;
+    my ( $dsl, $params, $rules_file ) = @_;
 
     Validator->new(
-        appdir         => setting('appdir'),
+        appdir         => $dsl->setting('appdir'),
         params         => $params,
         plugin_setting => plugin_setting,
         rules_file     => $rules_file
@@ -37,7 +37,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Dancer::Plugin::DataTransposeValidator;
+    use Dancer2::Plugin::DataTransposeValidator;
 
     post '/' => sub {
         my $params = params;
@@ -48,7 +48,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Dancer plugin for for L<Data::Transpose::Validator>
+Dancer2 plugin for for L<Data::Transpose::Validator>
 
 =head1 FUNCTIONS
 
@@ -169,18 +169,13 @@ All errors for a parameter will be returned as an array reference.
 
 =head2 rules_dir
 
-Subdirectory of L<Dancer::Config/appdir> in which rules files are stored.
+Subdirectory of L<Dancer2::Config/appdir> in which rules files are stored.
 
 
 =head1 ACKNOWLEDGEMENTS
 
 Alexey Kolganov for L<Dancer::Plugin::ValidateTiny> which inspired a number
 of aspects of this plugin.
-
-=head1 SEE ALSO
-
-L<Dancer::Plugin::ValidateTiny> L<Dancer::Plugin::FormValidator>
-L<Dancer::Plugin::DataFu>
 
 =head1 AUTHOR
 
