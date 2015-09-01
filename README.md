@@ -4,7 +4,7 @@ Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for D
 
 # VERSION
 
-Version 0.001
+Version 0.002
 
 # SYNOPSIS
 
@@ -65,8 +65,8 @@ must contain a valid hash reference, e.g.:
         stripwhite => 1,
         collapse_whitespace => 1,
         requireall => 0,
-        unknown => fail,
-        missing => undefine,
+        unknown => "fail",
+        missing => "undefine",
     },
     prepare => {
         email => {
@@ -123,7 +123,7 @@ This can has a number of different values:
 
 - A false value (the default) means that only a single scalar error string will
 be returned for each parameter error. This will be the first error returned
-for the paramater by ["errors\_hash" in Data::Transpose::Validator](https://metacpan.org/pod/Data::Transpose::Validator#errors_hash).
+for the parameter by ["errors\_hash" in Data::Transpose::Validator](https://metacpan.org/pod/Data::Transpose::Validator#errors_hash).
 - joined
 
     All errors for a parameter will be returned joined by a full stop and a space.

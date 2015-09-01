@@ -1,5 +1,9 @@
 Revision history for Dancer::Plugin::DataTransposeValidator
 
+0.002 Tue  1 Sep 11:43:06 CEST 2015
+
+    * Add Dancer2 plugin
+
 0.001 Mon 31 Aug 19:23:52 CEST 2015
 
     * Initial release

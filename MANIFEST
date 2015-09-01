@@ -5,6 +5,7 @@ MANIFEST.SKIP
 README
 lib/Dancer/Plugin/DataTransposeValidator.pm
 lib/Dancer/Plugin/DataTransposeValidator/Validator.pm
+lib/Dancer2/Plugin/DataTransposeValidator.pm
 t/appdir/validation/rules1
 t/author/manifest.t
 t/author/pod.t

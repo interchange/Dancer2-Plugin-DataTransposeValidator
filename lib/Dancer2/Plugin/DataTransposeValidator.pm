@@ -11,13 +11,7 @@ use aliased 'Dancer::Plugin::DataTransposeValidator::Validator';
 
 Dancer2::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for Dancer2
 
-=head1 VERSION
-
-Version 0.001
-
 =cut
-
-our $VERSION = '0.001';
 
 register validator => sub {
     my ( $dsl, $params, $rules_file ) = @_;

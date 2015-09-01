@@ -3,7 +3,7 @@ NAME
     plugin for Dancer
 
 VERSION
-    Version 0.001
+    Version 0.002
 
 SYNOPSIS
         use Dancer::Plugin::DataTransposeValidator;
@@ -57,8 +57,8 @@ FUNCTIONS
                 stripwhite => 1,
                 collapse_whitespace => 1,
                 requireall => 0,
-                unknown => fail,
-                missing => undefine,
+                unknown => "fail",
+                missing => "undefine",
             },
             prepare => {
                 email => {
@@ -110,7 +110,7 @@ CONFIGURATION
 
     *   A false value (the default) means that only a single scalar error
         string will be returned for each parameter error. This will be the
-        first error returned for the paramater by "errors_hash" in
+        first error returned for the parameter by "errors_hash" in
         Data::Transpose::Validator.
 
     *   joined

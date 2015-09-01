@@ -12,6 +12,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok();
 
 __END__
+appdir
 Alexey
 Kolganov
 Mottram
