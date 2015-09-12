@@ -1,6 +1,6 @@
 package Dancer::Plugin::DataTransposeValidator;
 
-use utf8
+use utf8;
 use strict;
 use warnings;
 

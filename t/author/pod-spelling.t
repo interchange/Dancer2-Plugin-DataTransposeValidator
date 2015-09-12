@@ -19,3 +19,6 @@ Mottram
 params
 SysPete
 validator
+Rezić
+SREZIC
+Slaven
