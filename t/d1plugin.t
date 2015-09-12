@@ -13,8 +13,10 @@ use JSON qw//;
 use Plack::Builder;
 use Plack::Test;
 
-try_load_class('Dancer')
-  or plan skip_all => "Dancer required to run these tests";
+sub BEGIN {
+    try_load_class('Dancer')
+      or plan skip_all => "Dancer required to run these tests";
+}
 
 sub from_json {
     return JSON::from_json(shift);
