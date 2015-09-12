@@ -1,5 +1,9 @@
 Revision history for Dancer::Plugin::DataTransposeValidator
 
+0.004 Sat 12 Sep 12:07:46 CEST 2015
+
+    * Tests skip cleanly if D1 or D2 not installed
+
 0.003 Tue  1 Sep 16:31:53 CEST 2015
 
     * rules files can now contain a code reference to which args can be passed

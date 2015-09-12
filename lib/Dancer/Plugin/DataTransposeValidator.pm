@@ -1,5 +1,6 @@
 package Dancer::Plugin::DataTransposeValidator;
 
+use utf8
 use strict;
 use warnings;
 
@@ -7,17 +8,19 @@ use Dancer ':syntax';
 use Dancer::Plugin;
 use aliased 'Dancer::Plugin::DataTransposeValidator::Validator';
 
+=encoding utf8
+
 =head1 NAME
 
 Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for Dancer
 
 =head1 VERSION
 
-Version 0.003
+Version 0.004
 
 =cut
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 register validator => sub {
     my ( $params, $rules_file, @additional_args ) = @_;
@@ -212,6 +215,10 @@ L<Dancer::Plugin::DataFu>
 =head1 AUTHOR
 
 Peter Mottram (SysPete), C<< <peter@sysnix.com> >>
+
+=head1 CONTRIBUTORS
+
+Slaven Rezić (SREZIC), C<< <slaven@rezic.de> >>
 
 =head1 COPYRIGHT AND LICENSE
 

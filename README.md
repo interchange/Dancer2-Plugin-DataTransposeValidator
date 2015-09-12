@@ -4,7 +4,7 @@ Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for D
 
 # VERSION
 
-Version 0.003
+Version 0.004
 
 # SYNOPSIS
 
@@ -177,6 +177,10 @@ of aspects of this plugin.
 # AUTHOR
 
 Peter Mottram (SysPete), `<peter@sysnix.com>`
+
+# CONTRIBUTORS
+
+Slaven Rezić (SREZIC), `<slaven@rezic.de>`
 
 # COPYRIGHT AND LICENSE
 

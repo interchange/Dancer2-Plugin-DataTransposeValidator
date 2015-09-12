@@ -3,7 +3,7 @@ NAME
     plugin for Dancer
 
 VERSION
-    Version 0.003
+    Version 0.004
 
 SYNOPSIS
         use Dancer::Plugin::DataTransposeValidator;
@@ -163,6 +163,9 @@ SEE ALSO
 
 AUTHOR
     Peter Mottram (SysPete), "<peter@sysnix.com>"
+
+CONTRIBUTORS
+    Slaven Rezić (SREZIC), "<slaven@rezic.de>"
 
 COPYRIGHT AND LICENSE
     Copyright 2015 Peter Mottram (SysPete).
