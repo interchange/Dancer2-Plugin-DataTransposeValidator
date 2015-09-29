@@ -14,8 +14,8 @@ use Plack::Builder;
 use Plack::Test;
 
 sub BEGIN {
-    try_load_class('Dancer2')
-      or plan skip_all => "Dancer2 required to run these tests";
+    try_load_class('Dancer2', { -version => '0.15' } )
+      or plan skip_all => "Dancer2 >= 0.15 required to run these tests";
 }
 
 sub from_json {
