@@ -1,5 +1,13 @@
 Revision history for Dancer::Plugin::DataTransposeValidator
 
+0.006 Tue 29 Sep 10:02:49 CEST 2015
+
+    * skip D2 tests if D2 version is not >= 0.15
+
+0.005 Sun 27 Sep 20:13:56 CEST 2015
+ 
+    * don't supply ':syntax' to use Dancer2
+
 0.004 Sat 12 Sep 12:07:46 CEST 2015
 
     * Tests skip cleanly if D1 or D2 not installed

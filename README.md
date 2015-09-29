@@ -4,7 +4,7 @@ Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for D
 
 # VERSION
 
-Version 0.004
+Version 0.006
 
 # SYNOPSIS
 
