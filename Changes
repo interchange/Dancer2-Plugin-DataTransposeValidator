@@ -1,5 +1,9 @@
 Revision history for Dancer::Plugin::DataTransposeValidator
 
+0.007 Thu  1 Oct 19:17:35 CEST 2015
+
+    * small test changes
+
 0.006 Tue 29 Sep 10:02:49 CEST 2015
 
     * skip D2 tests if D2 version is not >= 0.15
