@@ -258,7 +258,7 @@ sub from_json {
         password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
       ];
     $res = $test->request($req);
-    ok( $res->is_success, "post good foo" );
+    ok( $res->is_success, "post good foo" ) or diag $res->content;
 
     $expected = {
         valid  => 1,
