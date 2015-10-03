@@ -10,7 +10,7 @@ my $PREREQ_PM = {
 # do want smokers to test on both
 if ( $ENV{AUTOMATED_TESTING} || $ENV{TRAVIS} eq 'true' ) {
     $PREREQ_PM->{Dancer} = 0;
-    $PREREQ_PM->{Dancer2} = 0;
+    $PREREQ_PM->{Dancer2} = '0.15';
 }
 
 WriteMakefile(
