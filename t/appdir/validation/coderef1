@@ -9,7 +9,7 @@ sub {
         },
         prepare => {
             email => {
-                validator => "EmailValid",
+                validator => "String",
             },
             foo => {
                 validator => shift,

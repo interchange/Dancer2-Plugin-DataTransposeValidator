@@ -8,7 +8,7 @@
     },
     prepare => {
         email => {
-            validator => "EmailValid",
+            validator => "String",
         },
         foo => {
             validator => "String",
