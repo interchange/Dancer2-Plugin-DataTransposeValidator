@@ -147,7 +147,7 @@ $expected = {
     }
 };
 $data = from_json( $res->content );
-cmp_deeply( $data, $expected, "good result" );
+cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
 # errors_hash is false
 $req = POST "$uri/default", [ foo => " bar ", password => "bad  pwd" ];
@@ -170,7 +170,7 @@ $expected = {
     }
 };
 $data = from_json( $res->content );
-cmp_deeply( $data, $expected, "good result" );
+cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
 # errors_hash is joined
 $req = POST "$uri/joined", [ foo => " bar ", password => "bad  pwd" ];
@@ -193,7 +193,7 @@ $expected = {
     }
 };
 $data = from_json( $res->content );
-cmp_deeply( $data, $expected, "good result" );
+cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
 # errors_hash is arrayref
 $req = POST "$uri/arrayref", [ foo => " bar ", password => "bad  pwd" ];
@@ -216,7 +216,7 @@ $expected = {
     }
 };
 $data = from_json( $res->content );
-cmp_deeply( $data, $expected, "good result" );
+cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 $data = $data->{errors}->{password};
 cmp_ok( ref($data), 'eq', 'ARRAY', "error value is an array reference" );
 
@@ -245,7 +245,7 @@ $expected = {
     }
 };
 $data = from_json( $res->content );
-cmp_deeply( $data, $expected, "good result" );
+cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
 # all valid
 $req = POST "$uri/default",
@@ -266,7 +266,7 @@ $expected = {
     }
 };
 $data = from_json( $res->content );
-cmp_deeply( $data, $expected, "good result" );
+cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
 # coderef with foo validated as String
 $req = POST "$uri/coderef1",
@@ -287,7 +287,7 @@ $expected = {
     }
 };
 $data = from_json( $res->content );
-cmp_deeply( $data, $expected, "good result" );
+cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
 # coderef with foo validated as String
 $req = POST "$uri/coderef2",
@@ -314,6 +314,6 @@ $expected = {
     }
 };
 $data = from_json( $res->content );
-cmp_deeply( $data, $expected, "good result" );
+cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
 done_testing;

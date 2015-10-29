@@ -150,7 +150,7 @@ sub from_json {
         }
     };
     $data = from_json( $res->content );
-    cmp_deeply( $data, $expected, "good result" );
+    cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
     # errors_hash is false
     $req = POST "$uri/default", [ foo => " bar ", password => "bad  pwd" ];
@@ -173,7 +173,7 @@ sub from_json {
         }
     };
     $data = from_json( $res->content );
-    cmp_deeply( $data, $expected, "good result" );
+    cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
     # errors_hash is joined
     $req = POST "$uri/joined", [ foo => " bar ", password => "bad  pwd" ];
@@ -196,7 +196,7 @@ sub from_json {
         }
     };
     $data = from_json( $res->content );
-    cmp_deeply( $data, $expected, "good result" );
+    cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
     # errors_hash is arrayref
     $req = POST "$uri/arrayref", [ foo => " bar ", password => "bad  pwd" ];
@@ -219,7 +219,7 @@ sub from_json {
         }
     };
     $data = from_json( $res->content );
-    cmp_deeply( $data, $expected, "good result" );
+    cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
     $data = $data->{errors}->{password};
     cmp_ok( ref($data), 'eq', 'ARRAY', "error value is an array reference" );
 
@@ -248,7 +248,7 @@ sub from_json {
         }
     };
     $data = from_json( $res->content );
-    cmp_deeply( $data, $expected, "good result" );
+    cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
     # all valid
     $req = POST "$uri/default",
@@ -269,7 +269,7 @@ sub from_json {
         }
     };
     $data = from_json( $res->content );
-    cmp_deeply( $data, $expected, "good result" );
+    cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
     # coderef with foo validated as String
     $req = POST "$uri/coderef1",
@@ -290,7 +290,7 @@ sub from_json {
         }
     };
     $data = from_json( $res->content );
-    cmp_deeply( $data, $expected, "good result" );
+    cmp_deeply( $data, $expected, "good result" ) or diag explain $data;
 
     # coderef with foo validated as String
     $req = POST "$uri/coderef2",
