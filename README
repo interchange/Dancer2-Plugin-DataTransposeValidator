@@ -3,7 +3,7 @@ NAME
     plugin for Dancer
 
 VERSION
-    Version 0.007
+    Version 0.008
 
 SYNOPSIS
         use Dancer::Plugin::DataTransposeValidator;

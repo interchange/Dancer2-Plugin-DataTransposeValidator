@@ -1,5 +1,10 @@
 Revision history for Dancer::Plugin::DataTransposeValidator
 
+0.008 Thu 29 Oct 17:04:06 CET 2015
+
+    * bump smoker dependency on Dancer2 within tests to 0.15
+    * add diag explain on deeply compare fail to help debug GH #2
+
 0.007 Thu  1 Oct 19:17:35 CEST 2015
 
     * small test changes
