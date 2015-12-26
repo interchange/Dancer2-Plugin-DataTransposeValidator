@@ -3,7 +3,6 @@ package Dancer2::Plugin::DataTransposeValidator;
 use strict;
 use warnings;
 
-use Dancer2;
 use Dancer2::Plugin;
 use aliased 'Dancer::Plugin::DataTransposeValidator::Validator';
 
