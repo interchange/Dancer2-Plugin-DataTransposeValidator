@@ -4,19 +4,17 @@ Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for D
 
 # VERSION
 
-Version 0.008
+Version 0.009
 
 # SYNOPSIS
 
-```perl
-use Dancer::Plugin::DataTransposeValidator;
+    use Dancer::Plugin::DataTransposeValidator;
 
-post '/' => sub {
-    my $params = params;
-    my $data = validator($params, 'rules-file');
-    if ( $data->{valid} ) { ... }
-}
-```
+    post '/' => sub {
+        my $params = params;
+        my $data = validator($params, 'rules-file');
+        if ( $data->{valid} ) { ... }
+    }
 
 # DESCRIPTION
 
@@ -60,69 +58,65 @@ The rules file format allows the ["validator"](#validator) to be configured usin
 all options available in [Data::Transpose::Validator](https://metacpan.org/pod/Data::Transpose::Validator). The rules file
 must contain a valid hash reference, e.g.: 
 
-```perl
-{
-    options => {
-        stripwhite => 1,
-        collapse_whitespace => 1,
-        requireall => 0,
-        unknown => "fail",
-        missing => "undefine",
-    },
-    prepare => {
-        email => {
-            validator => "EmailValid",
-            required => 1,
+    {
+        options => {
+            stripwhite => 1,
+            collapse_whitespace => 1,
+            requireall => 0,
+            unknown => "fail",
+            missing => "undefine",
         },
-        email2 => {
-            validator => {
-                class => "MyValidator::EmailValid",
-                absolute => 1,
-            }
-        },
-        field4 => {
-            validator => {
-                sub {
-                    my $field = shift;
-                    if ( $field =~ /^\d+/ && $field > 0 ) {
-                        return 1;
-                    }
-                    else {
-                        return ( undef, "Not a positive integer" );
+        prepare => {
+            email => {
+                validator => "EmailValid",
+                required => 1,
+            },
+            email2 => {
+                validator => {
+                    class => "MyValidator::EmailValid",
+                    absolute => 1,
+                }
+            },
+            field4 => {
+                validator => {
+                    sub {
+                        my $field = shift;
+                        if ( $field =~ /^\d+/ && $field > 0 ) {
+                            return 1;
+                        }
+                        else {
+                            return ( undef, "Not a positive integer" );
+                        }
                     }
                 }
             }
         }
     }
-}
-```
 
 Note that the value of the `prepare` key must be a hash reference since the
 array reference form of ["prepare" in Data::Transpose::Validator](https://metacpan.org/pod/Data::Transpose::Validator#prepare) is not supported.
 
 As an alternative the rules file can contain a code reference, e.g.:
 
-```perl
-sub {
-    my $username = shift;
-    return {
-        options => {
-            stripwhite => 1,
-        },
-        prepare => {
-            password => {
-                validator => {
-                    class => 'PasswordPolicy',
-                    options => {
-                        username  => $username,
-                        minlength => 8,
+    sub {
+        my $username = shift;
+        return {
+            options => {
+                stripwhite => 1,
+            },
+            prepare => {
+                password => {
+                    validator => {
+                        class => 'PasswordPolicy',
+                        options => {
+                            username  => $username,
+                            minlength => 8,
+                        }
                     }
                 }
             }
-        }
-    };
-}
-```
+        };
+    }
 
 The code reference receives the `@additional_args` passed to ["validator"](#validator).
 The code reference must return a valid hash reference.
@@ -132,13 +126,11 @@ The code reference must return a valid hash reference.
 The following configuration settings are available (defaults are
 shown here):
 
-```
-plugins:
-  DataTransposeValidator:
-    css_error_class: has-error
-    errors_hash: 0
-    rules_dir: validation
-```
+    plugins:
+      DataTransposeValidator:
+        css_error_class: has-error
+        errors_hash: 0
+        rules_dir: validation
 
 ## css\_error\_class
 
@@ -184,7 +176,7 @@ Slaven Rezić (SREZIC), `<slaven@rezic.de>`
 
 # COPYRIGHT AND LICENSE
 
-Copyright 2015 Peter Mottram (SysPete).
+Copyright 2015-2016 Peter Mottram (SysPete).
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,9 @@
 Revision history for Dancer::Plugin::DataTransposeValidator
 
+0.009 Thu 21 Apr 12:57:26 CEST 2016
+
+    * stop using aliased
+
 0.008 Thu 29 Oct 17:40:31 CET 2015
 
     * validate email address in tests using String closes GH #2

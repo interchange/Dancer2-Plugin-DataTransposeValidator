@@ -10,7 +10,14 @@ use Dancer::Plugin::DataTransposeValidator::Validator;
 
 Dancer2::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for Dancer2
 
+=head1 VERSION
+
+Version 0.009
+
 =cut
+
+our $VERSION = '0.009';
+
 
 register validator => sub {
     my ( $dsl, $params, $rules_file, @additional_args ) = @_;

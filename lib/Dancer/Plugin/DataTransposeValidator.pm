@@ -16,11 +16,11 @@ Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for D
 
 =head1 VERSION
 
-Version 0.008
+Version 0.009
 
 =cut
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 register validator => sub {
     my ( $params, $rules_file, @additional_args ) = @_;
@@ -222,7 +222,7 @@ Slaven Rezić (SREZIC), C<< <slaven@rezic.de> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 Peter Mottram (SysPete).
+Copyright 2015-2016 Peter Mottram (SysPete).
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as the Perl 5 programming language system itself.
