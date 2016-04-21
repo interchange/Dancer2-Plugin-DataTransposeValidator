@@ -6,7 +6,7 @@ use warnings;
 
 use Dancer ':syntax';
 use Dancer::Plugin;
-use aliased 'Dancer::Plugin::DataTransposeValidator::Validator';
+use Dancer::Plugin::DataTransposeValidator::Validator;
 
 =encoding utf8
 
@@ -25,7 +25,7 @@ our $VERSION = '0.008';
 register validator => sub {
     my ( $params, $rules_file, @additional_args ) = @_;
 
-    Validator->new(
+    Dancer::Plugin::DataTransposeValidator::Validator->new(
         additional_args => @additional_args ? [@additional_args] : [],
         appdir          => setting('appdir'),
         params          => $params,

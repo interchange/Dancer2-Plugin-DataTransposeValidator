@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Dancer2::Plugin;
-use aliased 'Dancer::Plugin::DataTransposeValidator::Validator';
+use Dancer::Plugin::DataTransposeValidator::Validator;
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ Dancer2::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for 
 register validator => sub {
     my ( $dsl, $params, $rules_file, @additional_args ) = @_;
 
-    Validator->new(
+    Dancer::Plugin::DataTransposeValidator::Validator->new(
         additional_args => @additional_args ? [@additional_args] : [],
         appdir          => $dsl->setting('appdir'),
         params          => $params,
