@@ -3,8 +3,12 @@ package Dancer2::Plugin::DataTransposeValidator;
 use strict;
 use warnings;
 
+use Carp 'croak';
+use Path::Tiny;
+use Dancer2::Core::Types;
+use Data::Transpose::Validator;
+
 use Dancer2::Plugin;
-use Dancer::Plugin::DataTransposeValidator::Validator;
 
 =head1 NAME
 
@@ -12,26 +16,94 @@ Dancer2::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for 
 
 =head1 VERSION
 
-Version 0.009
+Version 0.100
 
 =cut
 
-our $VERSION = '0.009';
+our $VERSION = '0.100';
 
+has css_error_class => (
+    is          => 'ro',
+    isa         => Str,
+    from_config => sub { 'has-error' },
+);
 
-register validator => sub {
-    my ( $dsl, $params, $rules_file, @additional_args ) = @_;
+has errors_hash => (
+    is          => 'ro',
+    isa         => Maybe [Str],
+    from_config => sub { undef },
+);
 
-    Dancer::Plugin::DataTransposeValidator::Validator->new(
-        additional_args => @additional_args ? [@additional_args] : [],
-        appdir          => $dsl->setting('appdir'),
-        params          => $params,
-        plugin_setting  => plugin_setting,
-        rules_file      => $rules_file
-    )->transpose;
-};
+has rules_dir => (
+    is  => 'ro',
+    isa => sub {
+        eval { path( $_[0] )->is_dir; 1 }
+          or do { croak "rules directory does not exist" };
+    },
+    default => sub {
+        my $plugin = shift;
+        my $dir =
+            $plugin->config->{rules_dir}
+          ? $plugin->config->{rules_dir}
+          : 'validation';
+        path($plugin->app->setting('appdir'))->child($dir)->stringify;
+    },
+);
 
-register_plugin;
+plugin_keywords 'validator';
+
+sub validator {
+    my ( $plugin, $params, $rules_file, @additional_args ) = @_;
+
+    croak "params must be a hash reference" unless ref($params) eq 'HASH';
+
+    my $path = path( $plugin->rules_dir )->child($rules_file);
+    croak "rules_file does not exist" unless $path->is_file;
+
+    my $rules = do $path or croak "bad rules file: $path - $! $@";
+    if ( ref($rules) eq 'CODE' ) {
+        $rules = $rules->(@additional_args);
+    }
+
+    my $options = $rules->{options} || {};
+    my $prepare = $rules->{prepare} || {};
+
+    my $dtv = Data::Transpose::Validator->new(%$options);
+    $dtv->prepare(%$prepare);
+
+    my $clean = $dtv->transpose($params);
+    my $ret;
+
+    if ($clean) {
+        $ret->{valid}  = 1;
+        $ret->{values} = $clean;
+    }
+    else {
+        $ret->{valid}  = 0;
+        $ret->{values} = $dtv->transposed_data;
+
+        my $v_hash = $dtv->errors_hash;
+        while ( my ( $key, $value ) = each %$v_hash ) {
+
+            $ret->{css}->{$key} = $plugin->css_error_class;
+
+            my @errors = map { $_->{value} } @{$value};
+
+            if ( $plugin->errors_hash && $plugin->errors_hash eq 'joined' ) {
+                $ret->{errors}->{$key} = join( ". ", @errors );
+            }
+            elsif ( $plugin->errors_hash && $plugin->errors_hash eq 'arrayref' )
+            {
+                $ret->{errors}->{$key} = \@errors;
+            }
+            else {
+                $ret->{errors}->{$key} = $errors[0];
+            }
+        }
+    }
+    return $ret;
+
+}
 
 1;
 __END__
