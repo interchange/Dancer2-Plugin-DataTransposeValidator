@@ -1,23 +1,10 @@
 use ExtUtils::MakeMaker;
 
-my $PREREQ_PM = {
-    'Data::Transpose'  => '0.0020',
-    'Moo'              => 0,
-    'namespace::clean' => 0,
-};
-
-# we are for D1 and D2 and don't want to force users to have both but we
-# do want smokers to test on both
-if ( $ENV{AUTOMATED_TESTING} || $ENV{TRAVIS} eq 'true' ) {
-    $PREREQ_PM->{Dancer} = 0;
-    $PREREQ_PM->{Dancer2} = '0.15';
-}
-
 WriteMakefile(
-    NAME          => 'Dancer::Plugin::DataTransposeValidator',
+    NAME          => 'Dancer2::Plugin::DataTransposeValidator',
     AUTHOR        => 'Peter Mottram <peter@sysnix.com>',
-    VERSION_FROM  => 'lib/Dancer/Plugin/DataTransposeValidator.pm',
-    ABSTRACT      => 'Data::Transpose::Validator plugin for Dancer and Dancer2',
+    VERSION_FROM  => 'lib/Dancer2/Plugin/DataTransposeValidator.pm',
+    ABSTRACT      => 'Data::Transpose::Validator plugin for Dancer2',
     ( $ExtUtils::MakeMaker::VERSION >= 6.48
         ? ( 'LICENSE' => 'perl' )
         : () ),
@@ -33,16 +20,19 @@ WriteMakefile(
         'Test::Exception'       => 0,
         'Test::More'            => 0,
     },
-    PREREQ_PM => $PREREQ_PM,
+    PREREQ_PM => {
+        'Dancer2'          => '0.200000',
+        'Data::Transpose'  => '0.0020',
+        'Moo'              => '2.000000',
+        'namespace::clean' => 0,
+    },
     dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Dancer-Plugin-DataTransposeValidator-*' },
+    clean => { FILES => 'Dancer2-Plugin-DataTransposeValidator-*' },
     test  => { TESTS => join( ' ', ( glob('t/*.t'), glob('t/*/*.t') ) ) },
     META_MERGE => {
         resources => {
-            repository =>
-'https://github.com/interchange/Dancer-Plugin-DataTransposeValidator.git',
-            bugtracker =>
-'https://github.com/interchange/Dancer-Plugin-DataTransposeValidator/issues',
+            repository => 'https://github.com/interchange/Dancer2-Plugin-DataTransposeValidator.git',
+            bugtracker => 'https://github.com/interchange/Dancer2-Plugin-DataTransposeValidator/issues',
             IRC => 'irc://irc.freenode.net/#interchange',
         },
     },
