@@ -4,11 +4,12 @@ use strict;
 use warnings;
 
 use Carp 'croak';
-use Path::Tiny;
-use Dancer2::Core::Types;
+use Dancer2::Core::Types qw(HashRef Maybe Str);
 use Data::Transpose::Validator;
+use Path::Tiny;
+use Module::Runtime qw/use_module/;
 
-use Dancer2::Plugin;
+use Dancer2::Plugin 0.200000;
 
 =head1 NAME
 
@@ -34,6 +35,18 @@ has errors_hash => (
     from_config => sub { undef },
 );
 
+has rules => (
+    is      => 'ro',
+    isa     => HashRef,
+    default => sub { +{} },
+);
+
+has rules_class => (
+    is          => 'ro',
+    isa         => Maybe[Str],
+    from_config => sub { undef },
+);
+
 has rules_dir => (
     is  => 'ro',
     isa => sub {
@@ -48,21 +61,63 @@ has rules_dir => (
           : 'validation';
         path($plugin->app->setting('appdir'))->child($dir)->stringify;
     },
+    predicate => 1,
 );
 
 plugin_keywords 'validator';
 
+sub BUILD {
+    my $plugin = shift;
+    croak __PACKAGE__ . " cannot use both of rules_class and rules_dir"
+      if exists $plugin->config->{rules_class}
+      && exists $plugin->config->{rules_dir};
+
+    if ( exists $plugin->config->{rules_class} ) {
+        use_module($plugin->config->{rules_class});
+    }
+}
+
 sub validator {
-    my ( $plugin, $params, $rules_file, @additional_args ) = @_;
+    my ( $plugin, $params, $name, @additional_args ) = @_;
+    my $rules;
 
     croak "params must be a hash reference" unless ref($params) eq 'HASH';
 
-    my $path = path( $plugin->rules_dir )->child($rules_file);
-    croak "rules_file does not exist" unless $path->is_file;
+    if ( ref($name) eq '' ) {
+        if ( !$plugin->rules->{$name} ) {
+            if ( my $class = $plugin->rules_class ) {
+                if ( $class->can($name) ) {
+                    $plugin->rules->{$name} = \&{"$class::$name"};
+                }
+                else {
+                    croak "Rules class \"$class\" has no rule sub named: $name";
+                }
+            }
+            else {
+                # nasty old rules_dir
+                my $path = path( $plugin->rules_dir )->child($name);
+                croak "rules_file does not exist" unless $path->is_file;
 
-    my $rules = do $path or croak "bad rules file: $path - $! $@";
-    if ( ref($rules) eq 'CODE' ) {
-        $rules = $rules->(@additional_args);
+                my $eval = do $path or croak "bad rules file: $path - $! $@";
+                if ( ref($eval) eq 'CODE' ) {
+                    $plugin->rules->{$name} = $eval;
+                }
+                else {
+                    $plugin->rules->{$name} = sub { $eval };
+                }
+            }
+        }
+        $rules = $plugin->rules->{$name}->(@additional_args);
+    }
+    elsif (ref($name) eq 'HASH') {
+        $rules = sub { $name };
+    }
+    elsif (ref($name) eq 'CODE') {
+        $rules = $name->(@additional_args);
+    }
+    else {
+        my $ref = ref($name);
+        croak "rules option reference type $ref not allowed";
     }
 
     my $options = $rules->{options} || {};
@@ -127,11 +182,28 @@ Dancer2 plugin for for L<Data::Transpose::Validator>
 
 This module exports the single function C<validator>.
 
-=head2 validator( $params, $rules_file, @additional_args )
+=head2 validator( $params, $rules, @additional_args? )
 
-Arguments should be a hash reference of parameters to be validated and the
-name of the rules file to use. Any C<@additional_args> are passed as arguments
-to the rules file B<only> if it is a code reference. See L</RULES FILE>.
+Where:
+
+C<$params> is a hash reference of parameters to be validated.
+
+C<$rules> is one of:
+
+=over
+
+=item * the name of a rule sub if you are using L</rules_class>
+
+=item * the name of a rule file if you are using L</rules_dir>
+
+=item * a hash reference of rules
+
+=item * a code reference that will return a hashref of rules
+
+=back
+
+Any optional C<@additional_args> are passed as arguments to code
+references/subs.
 
 A hash reference with the following keys is returned:
 
@@ -159,7 +231,141 @@ L</CONFIGURATION>.
 
 =back
 
-=head2 RULES FILE
+=head1 CONFIGURATION
+
+The following configuration settings are available (defaults are
+shown here):
+
+    plugins:
+      DataTransposeValidator:
+        css_error_class: has-error
+        errors_hash: 0
+        rules_class: MyApp::ValidationRules
+        # OR:
+        rules_dir: validation
+
+=head2 css_error_class
+
+The class returned as a value for parameters in the css key of the hash
+reference returned by L</validator>.
+
+=head2 errors_hash
+
+This can has a number of different values:
+
+=over 4
+
+=item * 0
+
+A false value (the default) means that only a single scalar error string will
+be returned for each parameter error. This will be the first error returned
+for the parameter by L<Data::Transpose::Validator/errors_hash>.
+
+=item * joined
+
+All errors for a parameter will be returned joined by a full stop and a space.
+
+=item * arrayref
+
+All errors for a parameter will be returned as an array reference.
+
+=back
+
+=head2 rules_class
+
+This is much preferred over L</rules_dir> since it does not eval external files.
+
+This is a class (package) name such as C<MyApp::Validator::Rules>. There should
+be one sub for each rule name inside that class which returns a hash reference.
+See L</RULES CLASS> for examples.
+
+=head2 rules_dir
+
+Subdirectory of L<Dancer2::Config/appdir> in which rules files are stored.
+B<NOTE:> We recommend you do not use this approach since the rules files
+are eval'ed with all the security risks that entails. Please use L</rules_class>
+instead. B<You have been warned>. See L</RULES DIR> for examples.
+
+=head2 RULES CLASS
+
+The rules class allows the L</validator> to be configured using
+all options available in L<Data::Transpose::Validator>. The rules class must
+contain one sub for each rule name which will be passed any C<@optional_args>.
+
+    package MyApp::ValidationRules;
+
+    sub register {
+        # simple hashref
+        +{
+            options => {
+                stripwhite => 1,
+                collapse_whitespace => 1,
+                requireall => 1,
+            },
+            prepare => {
+                email => {
+                    validator => "EmailValid",
+                },
+                email2 => {
+                    validator => "EmailValid",
+                },
+                emails => {
+                    validator => 'Group',
+                    fields => [ "email", "email2" ],
+                },
+            },
+        };
+    }
+
+    sub change_password {
+        # args and hashref
+        my %args = @_;
+        +{
+            options => {
+                requireall => 1,
+            },
+            prepare => {
+                old_password => {
+                    required  => 1,
+                    validator => sub {
+                        if ( $args{logged_in_user}->check_password( $_[0] ) ) {
+                            return 1;
+                        }
+                        else {
+                            return ( undef, "Password incorrect" );
+                        }
+                    },
+                },
+                password => {
+                    required  => 1,
+                    validator => {
+                        class   => 'PasswordPolicy',
+                        options => {
+                            username      => $args{logged_in_user}->username,
+                            minlength     => 8,
+                            maxlength     => 70,
+                            patternlength => 4,
+                            mindiffchars  => 5,
+                            disabled      => {
+                                digits   => 1,
+                                mixed    => 1,
+                                specials => 1,
+                            }
+                        }
+                    }
+                },
+                confirm_password => { required => 1 },
+                passwords        => {
+                    validator => 'Group',
+                    fields    => [ "password", "confirm_password" ],
+                },
+            },
+        };
+    }
+
+    1;
+
+=head2 RULES DIR
 
 The rules file format allows the L</validator> to be configured using
 all options available in L<Data::Transpose::Validator>. The rules file
@@ -228,53 +434,16 @@ As an alternative the rules file can contain a code reference, e.g.:
 The code reference receives the C<@additional_args> passed to L</validator>.
 The code reference must return a valid hash reference.
 
-=head1 CONFIGURATION
+=head1 SEE ALSO
 
-The following configuration settings are available (defaults are
-shown here):
-
-    plugins:
-      DataTransposeValidator:
-        css_error_class: has-error
-        errors_hash: 0
-        rules_dir: validation
-
-=head2 css_error_class
-
-The class returned as a value for parameters in the css key of the hash
-reference returned by L</validator>.
-
-=head2 errors_hash
-
-This can has a number of different values:
-
-=over 4
-
-=item * 0
-
-A false value (the default) means that only a single scalar error string will
-be returned for each parameter error. This will be the first error returned
-for the parameter by L<Data::Transpose::Validator/errors_hash>.
-
-=item * joined
-
-All errors for a parameter will be returned joined by a full stop and a space.
-
-=item * arrayref
-
-All errors for a parameter will be returned as an array reference.
-
-=back
-
-=head2 rules_dir
-
-Subdirectory of L<Dancer2::Config/appdir> in which rules files are stored.
-
+L<Dancer2>, L<Data::Transpose>
 
 =head1 ACKNOWLEDGEMENTS
 
 Alexey Kolganov for L<Dancer::Plugin::ValidateTiny> which inspired a number
-of aspects of this plugin.
+of aspects of the original version of this plugin.
+
+Stefan Hornburg (Racke) for his valuable feedback.
 
 =head1 AUTHOR
 
@@ -282,7 +451,7 @@ Peter Mottram (SysPete), C<< <peter@sysnix.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 Peter Mottram (SysPete).
+Copyright 2015-2016 Peter Mottram (SysPete).
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as the Perl 5 programming language system itself.

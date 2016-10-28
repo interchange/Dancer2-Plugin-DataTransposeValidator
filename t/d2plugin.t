@@ -8,7 +8,8 @@ BEGIN {
 
 use Test::More import => ['!pass'];
 use Test::Deep;
-use Test::Exception;
+use Test::Fatal;
+use lib 't/lib';
 
 use File::Spec;
 use HTTP::Request::Common;
@@ -47,6 +48,45 @@ use Plack::Test;
         content_type('application/json');
         return to_json($data);
     };
+
+}
+
+{
+    package TestAppClass;
+
+    use Dancer2;
+    BEGIN {
+        set plugins => {
+            DataTransposeValidator => {
+                rules_class => 'TestRules',
+            }
+        };
+    }
+    use Dancer2::Plugin::DataTransposeValidator;
+
+    get '/rules/:name' => sub {
+        my $name = route_parameters->get('name');
+        # pass foo vaildator to avoid unitialized warnings
+        validator( {}, $name, 'String' );
+        # this time we pass Foo just so we see it working
+        my $rules =
+          app->with_plugin('DataTransposeValidator')->rules->{$name}->('Foo');
+        send_as JSON => $rules;
+    };
+
+    post '/foo_as_string' => sub {
+        my $params = params;
+        my $data = validator( $params, 'login', 'String' );
+        content_type('application/json');
+        return to_json($data);
+    };
+
+    post '/foo_as_email_valid' => sub {
+        my $params = params;
+        my $data = validator( $params, 'login', 'EmailValid' );
+        content_type('application/json');
+        return to_json($data);
+    };
 }
 
 {
@@ -54,13 +94,14 @@ use Plack::Test;
     package TestAppNoErrorsJoined;
 
     use Dancer2;
+    BEGIN {
+        set plugins => {
+            DataTransposeValidator => {
+                errors_hash => "joined"
+            }
+        };
+    }
     use Dancer2::Plugin::DataTransposeValidator;
-
-    set plugins => {
-        DataTransposeValidator => {
-            errors_hash => "joined"
-        }
-    };
 
     post '/joined' => sub {
         my $params = params;
@@ -75,13 +116,14 @@ use Plack::Test;
     package TestAppNoErrorsArrayRef;
 
     use Dancer2;
+    BEGIN {
+        set plugins => {
+            DataTransposeValidator => {
+                errors_hash => "arrayref"
+            }
+        };
+    }
     use Dancer2::Plugin::DataTransposeValidator;
-
-    set plugins => {
-        DataTransposeValidator => {
-            errors_hash => "arrayref"
-        }
-    };
 
     post '/arrayref' => sub {
         my $params = params;
@@ -96,13 +138,14 @@ use Plack::Test;
     package TestAppCssErrorClass;
 
     use Dancer2;
+    BEGIN {
+        set plugins => {
+            DataTransposeValidator => {
+                css_error_class => "foo"
+            }
+        };
+    }
     use Dancer2::Plugin::DataTransposeValidator;
-
-    set plugins => {
-        DataTransposeValidator => {
-            css_error_class => "foo"
-        }
-    };
 
     post '/css-foo' => sub {
         my $params = params;
@@ -117,13 +160,14 @@ use Plack::Test;
     package TestAppBadRulesDir;
 
     use Dancer2;
+    BEGIN {
+        set plugins => {
+            DataTransposeValidator => {
+                rules_dir => "foo"
+            }
+        };
+    }
     use Dancer2::Plugin::DataTransposeValidator;
-
-    set plugins => {
-        DataTransposeValidator => {
-            rules_dir => "foo"
-        }
-    };
 
     post '/bad_rules_dir' => sub {
         my $params = params;
@@ -138,13 +182,14 @@ use Plack::Test;
     package TestAppGoodRulesDir;
 
     use Dancer2;
+    BEGIN {
+        set plugins => {
+            DataTransposeValidator => {
+                rules_dir => "validation"
+            }
+        };
+    }
     use Dancer2::Plugin::DataTransposeValidator;
-
-    set plugins => {
-        DataTransposeValidator => {
-            rules_dir => "validation"
-        }
-    };
 
     post '/good_rules_dir' => sub {
         my $params = params;
@@ -294,6 +339,88 @@ subtest 'TestAppNoConfig /coderef2' => sub {
     };
     $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
+};
+
+subtest 'Testing rules via rules_class setting' => sub {
+
+    my $test = Plack::Test->create( TestAppClass->to_app );
+
+    $req = GET "$uri/rules/login";
+    $res = $test->request($req);
+    ok $res->is_success, "GET /rules/login is success";
+
+    cmp_deeply decode_json($res->content),
+      {
+        options => {
+            stripwhite          => 1,
+            collapse_whitespace => 1,
+            requireall          => 1,
+            unknown             => "fail",
+        },
+        prepare => {
+            email => {
+                validator => "String",
+            },
+            foo => {
+                validator => "Foo",
+            },
+            password => {
+                validator => {
+                    class   => "PasswordPolicy",
+                    options => {
+                        disabled => {
+                            username => 1,
+                        },
+                    },
+                },
+            },
+        }
+      },
+      "... and the returned rules are as expected"
+          or diag explain $res->content;
+
+    $req = POST "$uri/foo_as_string",
+      [
+        foo      => "bar",
+        email    => 'user@example.com',
+        password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+      ];
+    $res = $test->request($req);
+    ok( $res->is_success, "Validate some good data with foo as String" );
+
+    cmp_deeply decode_json( $res->content ),
+      {
+        values => {
+            foo      => "bar",
+            email    => 'user@example.com',
+            password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+        },
+        valid => 1
+      },
+      "... and validation passed with all data returned as expected";
+
+    $req = POST "$uri/foo_as_email_valid",
+      [
+        foo      => "bar",
+        email    => 'user@example.com',
+        password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+      ];
+    $res = $test->request($req);
+    ok( $res->is_success,
+        "Validate some bad data with simple string foo as EmailValid" );
+
+    cmp_deeply decode_json( $res->content ),
+      {
+        css    => { foo => ignore() },
+        values => {
+            foo      => "bar",
+            email    => 'user@example.com',
+            password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+        },
+        valid  => 0,
+        errors => { foo => ignore() },
+      },
+      "... and validation failed with all data returned as expected";
 };
 
 $test = Plack::Test->create( TestAppNoErrorsJoined->to_app );
