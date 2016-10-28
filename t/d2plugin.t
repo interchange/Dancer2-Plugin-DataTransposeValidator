@@ -2,27 +2,19 @@
 use strict;
 use warnings;
 
+BEGIN {
+    $ENV{DANCER_CONFDIR} = 't';
+}
+
 use Test::More import => ['!pass'];
 use Test::Deep;
 use Test::Exception;
 
-use Class::Load qw/try_load_class/;
 use File::Spec;
 use HTTP::Request::Common;
-use JSON qw//;
+use JSON::MaybeXS;
 use Plack::Builder;
 use Plack::Test;
-
-sub BEGIN {
-    try_load_class( 'Dancer2'  )
-      or plan skip_all => "Dancer2 required to run these tests";
-#    try_load_class( 'Dancer2', { -version => '0.15' } )
-#      or plan skip_all => "Dancer2 >= 0.15 required to run these tests";
-}
-
-sub from_json {
-    return JSON::from_json(shift);
-}
 
 {
 
@@ -30,8 +22,6 @@ sub from_json {
 
     use Dancer2;
     use Dancer2::Plugin::DataTransposeValidator;
-    set appdir => File::Spec->catdir( 't', 'appdir' );
-    set logger => "null";
 
     get '/' => sub {
         return "home";
@@ -65,8 +55,6 @@ sub from_json {
 
     use Dancer2;
     use Dancer2::Plugin::DataTransposeValidator;
-    set appdir => File::Spec->catdir( 't', 'appdir' );
-    set logger => "null";
 
     set plugins => {
         DataTransposeValidator => {
@@ -88,8 +76,6 @@ sub from_json {
 
     use Dancer2;
     use Dancer2::Plugin::DataTransposeValidator;
-    set appdir => File::Spec->catdir( 't', 'appdir' );
-    set logger => "null";
 
     set plugins => {
         DataTransposeValidator => {
@@ -111,8 +97,6 @@ sub from_json {
 
     use Dancer2;
     use Dancer2::Plugin::DataTransposeValidator;
-    set appdir => File::Spec->catdir( 't', 'appdir' );
-    set logger => "null";
 
     set plugins => {
         DataTransposeValidator => {
@@ -134,8 +118,6 @@ sub from_json {
 
     use Dancer2;
     use Dancer2::Plugin::DataTransposeValidator;
-    set appdir => File::Spec->catdir( 't', 'appdir' );
-    set logger => "null";
 
     set plugins => {
         DataTransposeValidator => {
@@ -157,8 +139,6 @@ sub from_json {
 
     use Dancer2;
     use Dancer2::Plugin::DataTransposeValidator;
-    set appdir => File::Spec->catdir( 't', 'appdir' );
-    set logger => "null";
 
     set plugins => {
         DataTransposeValidator => {
@@ -209,7 +189,7 @@ subtest 'TestAppNoConfig /default missing email & password' => sub {
             foo => "bar",
         }
     };
-    $data = from_json( $res->content );
+    $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
 };
 
@@ -235,7 +215,7 @@ subtest 'TestAppNoConfig /default missing email' => sub {
             password => "bad pwd",
         }
     };
-    $data = from_json( $res->content );
+    $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
 };
 
@@ -258,7 +238,7 @@ subtest 'TestAppNoConfig /default all valid' => sub {
             password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
         }
     };
-    $data = from_json( $res->content );
+    $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
 };
 
@@ -282,7 +262,7 @@ subtest 'TestAppNoConfig /coderef1' => sub {
             password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
         }
     };
-    $data = from_json( $res->content );
+    $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
 };
 
@@ -312,7 +292,7 @@ subtest 'TestAppNoConfig /coderef2' => sub {
             password => "cA\$(!n6K)Y.zoKoqayL}\$O6EY}Q+g"
         }
     };
-    $data = from_json( $res->content );
+    $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
 };
 
@@ -340,7 +320,7 @@ subtest 'TestAppNoErrorsJoined /joined' => sub {
             password => "bad pwd",
         }
     };
-    $data = from_json( $res->content );
+    $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
 };
 
@@ -368,7 +348,7 @@ subtest 'TestAppNoErrorsArrayRef /arrayref' => sub {
             password => "bad pwd",
         }
     };
-    $data = from_json( $res->content );
+    $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
     $data = $data->{errors}->{password};
     cmp_ok( ref($data), 'eq', 'ARRAY', "error value is an array reference" );
@@ -398,7 +378,7 @@ subtest 'TestAppCssErrorClass /css-foo' => sub {
             password => "bad pwd",
         }
     };
-    $data = from_json( $res->content );
+    $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
 };
 
@@ -435,7 +415,7 @@ subtest 'TestAppGoodRulesDir /good_rules_dir' => sub {
             foo => "bar",
         }
     };
-    $data = from_json( $res->content );
+    $data = decode_json( $res->content );
     cmp_deeply( $data, $expected, "good result" );
 };
 
