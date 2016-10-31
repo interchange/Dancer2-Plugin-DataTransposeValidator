@@ -61,7 +61,6 @@ has rules_dir => (
           : 'validation';
         path($plugin->app->setting('appdir'))->child($dir)->stringify;
     },
-    predicate => 1,
 );
 
 plugin_keywords 'validator';

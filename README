@@ -1,12 +1,12 @@
 NAME
-    Dancer::Plugin::DataTransposeValidator - Data::Transpose::Validator
-    plugin for Dancer
+    Dancer2::Plugin::DataTransposeValidator - Data::Transpose::Validator
+    plugin for Dancer2
 
 VERSION
-    Version 0.009
+    Version 0.100
 
 SYNOPSIS
-        use Dancer::Plugin::DataTransposeValidator;
+        use Dancer2::Plugin::DataTransposeValidator;
 
         post '/' => sub {
             my $params = params;
@@ -15,16 +15,28 @@ SYNOPSIS
         }
 
 DESCRIPTION
-    Dancer plugin for for Data::Transpose::Validator
+    Dancer2 plugin for for Data::Transpose::Validator
 
 FUNCTIONS
     This module exports the single function "validator".
 
-  validator( $params, $rules_file, @additional_args )
-    Arguments should be a hash reference of parameters to be validated and
-    the name of the rules file to use. Any @additional_args are passed as
-    arguments to the rules file only if it is a code reference. See "RULES
-    FILE".
+  validator( $params, $rules, @additional_args? )
+    Where:
+
+    $params is a hash reference of parameters to be validated.
+
+    $rules is one of:
+
+    *   the name of a rule sub if you are using "rules_class"
+
+    *   the name of a rule file if you are using "rules_dir"
+
+    *   a hash reference of rules
+
+    *   a code reference that will return a hashref of rules
+
+    Any optional @additional_args are passed as arguments to code
+    references/subs.
 
     A hash reference with the following keys is returned:
 
@@ -49,7 +61,134 @@ FUNCTIONS
         validation. The value for each parameter is a css class. See
         "css_error_class" in "CONFIGURATION".
 
-  RULES FILE
+CONFIGURATION
+    The following configuration settings are available (defaults are shown
+    here):
+
+        plugins:
+          DataTransposeValidator:
+            css_error_class: has-error
+            errors_hash: 0
+            rules_class: MyApp::ValidationRules
+            # OR:
+            rules_dir: validation
+
+  css_error_class
+    The class returned as a value for parameters in the css key of the hash
+    reference returned by "validator".
+
+  errors_hash
+    This can has a number of different values:
+
+    *   A false value (the default) means that only a single scalar error
+        string will be returned for each parameter error. This will be the
+        first error returned for the parameter by "errors_hash" in
+        Data::Transpose::Validator.
+
+    *   joined
+
+        All errors for a parameter will be returned joined by a full stop
+        and a space.
+
+    *   arrayref
+
+        All errors for a parameter will be returned as an array reference.
+
+  rules_class
+    This is much preferred over "rules_dir" since it does not eval external
+    files.
+
+    This is a class (package) name such as "MyApp::Validator::Rules". There
+    should be one sub for each rule name inside that class which returns a
+    hash reference. See "RULES CLASS" for examples.
+
+  rules_dir
+    Subdirectory of "appdir" in Dancer2::Config in which rules files are
+    stored. NOTE: We recommend you do not use this approach since the rules
+    files are eval'ed with all the security risks that entails. Please use
+    "rules_class" instead. You have been warned. See "RULES DIR" for
+    examples.
+
+  RULES CLASS
+    The rules class allows the "validator" to be configured using all
+    options available in Data::Transpose::Validator. The rules class must
+    contain one sub for each rule name which will be passed any
+    @optional_args.
+
+        package MyApp::ValidationRules;
+
+        sub register {
+            # simple hashref
+            +{
+                options => {
+                    stripwhite => 1,
+                    collapse_whitespace => 1,
+                    requireall => 1,
+                },
+                prepare => {
+                    email => {
+                        validator => "EmailValid",
+                    },
+                    email2 => {
+                        validator => "EmailValid",
+                    },
+                    emails => {
+                        validator => 'Group',
+                        fields => [ "email", "email2" ],
+                    },
+                },
+            };
+        }
+
+        sub change_password {
+            # args and hashref
+            my %args = @_;
+            +{
+                options => {
+                    requireall => 1,
+                },
+                prepare => {
+                    old_password => {
+                        required  => 1,
+                        validator => sub {
+                            if ( $args{logged_in_user}->check_password( $_[0] ) ) {
+                                return 1;
+                            }
+                            else {
+                                return ( undef, "Password incorrect" );
+                            }
+                        },
+                    },
+                    password => {
+                        required  => 1,
+                        validator => {
+                            class   => 'PasswordPolicy',
+                            options => {
+                                username      => $args{logged_in_user}->username,
+                                minlength     => 8,
+                                maxlength     => 70,
+                                patternlength => 4,
+                                mindiffchars  => 5,
+                                disabled      => {
+                                    digits   => 1,
+                                    mixed    => 1,
+                                    specials => 1,
+                                }
+                            }
+                        }
+                    },
+                    confirm_password => { required => 1 },
+                    passwords        => {
+                        validator => 'Group',
+                        fields    => [ "password", "confirm_password" ],
+                    },
+                },
+            };
+        }
+
+        1;
+
+  RULES DIR
     The rules file format allows the "validator" to be configured using all
     options available in Data::Transpose::Validator. The rules file must
     contain a valid hash reference, e.g.:
@@ -118,54 +257,17 @@ FUNCTIONS
     The code reference receives the @additional_args passed to "validator".
     The code reference must return a valid hash reference.
 
-CONFIGURATION
-    The following configuration settings are available (defaults are shown
-    here):
-
-        plugins:
-          DataTransposeValidator:
-            css_error_class: has-error
-            errors_hash: 0
-            rules_dir: validation
-
-  css_error_class
-    The class returned as a value for parameters in the css key of the hash
-    reference returned by "validator".
-
-  errors_hash
-    This can has a number of different values:
-
-    *   A false value (the default) means that only a single scalar error
-        string will be returned for each parameter error. This will be the
-        first error returned for the parameter by "errors_hash" in
-        Data::Transpose::Validator.
-
-    *   joined
-
-        All errors for a parameter will be returned joined by a full stop
-        and a space.
-
-    *   arrayref
-
-        All errors for a parameter will be returned as an array reference.
-
-  rules_dir
-    Subdirectory of "appdir" in Dancer::Config in which rules files are
-    stored.
+SEE ALSO
+    Dancer2, Data::Transpose
 
 ACKNOWLEDGEMENTS
     Alexey Kolganov for Dancer::Plugin::ValidateTiny which inspired a number
-    of aspects of this plugin.
+    of aspects of the original version of this plugin.
 
-SEE ALSO
-    Dancer::Plugin::ValidateTiny Dancer::Plugin::FormValidator
-    Dancer::Plugin::DataFu
+    Stefan Hornburg (Racke) for his valuable feedback.
 
 AUTHOR
     Peter Mottram (SysPete), "<peter@sysnix.com>"
-
-CONTRIBUTORS
-    Slaven Rezić (SREZIC), "<slaven@rezic.de>"
 
 COPYRIGHT AND LICENSE
     Copyright 2015-2016 Peter Mottram (SysPete).

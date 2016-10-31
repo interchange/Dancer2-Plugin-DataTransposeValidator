@@ -1,5 +1,10 @@
 Revision history for Dancer::Plugin::DataTransposeValidator
 
+0.100 Mon 31 Oct 11:11:06 CET 2016
+
+    * Rules can now be configured in a class instead of eval'ed files.
+    * Plugin maintains a dispatch table in 'rules' attribute.
+
 0.009 Thu 21 Apr 12:57:26 CEST 2016
 
     * stop using aliased

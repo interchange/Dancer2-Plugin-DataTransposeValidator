@@ -13,10 +13,13 @@ all_pod_files_spelling_ok();
 
 __END__
 appdir
+eval'ed
 Alexey
+Hornburg
 Kolganov
 Mottram
 params
+Racke
 SysPete
 validator
 Rezić
