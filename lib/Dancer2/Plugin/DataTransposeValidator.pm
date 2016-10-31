@@ -168,7 +168,7 @@ __END__
 
     post '/' => sub {
         my $params = params;
-        my $data = validator($params, 'rules-file');
+        my $data = validator($params, 'myrule');
         if ( $data->{valid} ) { ... }
     }
 
