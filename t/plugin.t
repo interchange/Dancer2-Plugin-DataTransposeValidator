@@ -11,7 +11,6 @@ use Test::Deep;
 use Test::Fatal;
 use lib 't/lib';
 
-use File::Spec;
 use HTTP::Request::Common;
 use JSON::MaybeXS;
 use Plack::Builder;
