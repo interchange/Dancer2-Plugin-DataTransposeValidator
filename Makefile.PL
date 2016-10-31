@@ -17,7 +17,7 @@ WriteMakefile(
         'JSON'                  => 0,
         'Plack'                 => '1.0035',
         'Test::Deep'            => 0,
-        'Test::Exception'       => 0,
+        'Test::Fatal'           => 0,
         'Test::More'            => 0,
     },
     PREREQ_PM => {
