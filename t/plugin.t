@@ -87,6 +87,84 @@ use Plack::Test;
         content_type('application/json');
         return to_json($data);
     };
+
+    my $hashref = +{
+        options => {
+            stripwhite          => 1,
+            collapse_whitespace => 1,
+            requireall          => 1,
+            unknown             => "fail",
+        },
+        prepare => {
+            email => {
+                validator => "String",
+            },
+            foo => {
+                validator => "EmailValid",
+            },
+            password => {
+                validator => {
+                    class   => "PasswordPolicy",
+                    options => {
+                        disabled => {
+                            username => 1,
+                        },
+                    },
+                },
+            },
+        }
+    };
+
+    my $coderef = sub {
+        +{
+            options => {
+                stripwhite          => 1,
+                collapse_whitespace => 1,
+                requireall          => 1,
+                unknown             => "fail",
+            },
+            prepare => {
+                email => {
+                    validator => "String",
+                },
+                foo => {
+                    validator => "EmailValid",
+                },
+                password => {
+                    validator => {
+                        class   => "PasswordPolicy",
+                        options => {
+                            disabled => {
+                                username => 1,
+                            },
+                        },
+                    },
+                },
+            }
+          }
+
+    };
+
+    post '/hashref' => sub {
+        my $params = params;
+        my $data = validator( $params, $hashref );
+        content_type('application/json');
+        return to_json($data);
+    };
+
+    post '/coderef' => sub {
+        my $params = params;
+        my $data = validator( $params, $coderef );
+        content_type('application/json');
+        return to_json($data);
+    };
+
+    post '/arrayref' => sub {
+        my $params = params;
+        my $data = validator( $params, [] );
+        content_type('application/json');
+        return to_json($data);
+    };
 }
 
 {
@@ -344,6 +422,7 @@ subtest 'TestAppNoConfig /coderef2' => sub {
 subtest 'Testing rules via rules_class setting' => sub {
 
     my $test = Plack::Test->create( TestAppClass->to_app );
+    my $trap = TestAppClass->dancer_app->logger_engine->trapper;
 
     $req = GET "$uri/rules/login";
     $res = $test->request($req);
@@ -421,6 +500,74 @@ subtest 'Testing rules via rules_class setting' => sub {
         errors => { foo => ignore() },
       },
       "... and validation failed with all data returned as expected";
+
+    $req = POST "$uri/hashref",
+      [
+        foo      => "bar",
+        email    => 'user@example.com',
+        password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+      ];
+    $res = $test->request($req);
+    ok( $res->is_success, "Validate some bad data against hash-based rules" );
+
+    cmp_deeply decode_json( $res->content ),
+      {
+        css    => { foo => ignore() },
+        values => {
+            foo      => "bar",
+            email    => 'user@example.com',
+            password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+        },
+        valid  => 0,
+        errors => { foo => ignore() },
+      },
+      "... and validation failed with all data returned as expected";
+
+    $req = POST "$uri/coderef",
+      [
+        foo      => "bar",
+        email    => 'user@example.com',
+        password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+      ];
+    $res = $test->request($req);
+    ok( $res->is_success,
+        "Validate some bad data against coderef-based rules" );
+
+    cmp_deeply decode_json( $res->content ),
+      {
+        css    => { foo => ignore() },
+        values => {
+            foo      => "bar",
+            email    => 'user@example.com',
+            password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+        },
+        valid  => 0,
+        errors => { foo => ignore() },
+      },
+      "... and validation failed with all data returned as expected";
+
+    $trap->read;
+    $req = POST "$uri/arrayref",
+      [
+        foo      => "bar",
+        email    => 'user@example.com',
+        password => 'cA$(!n6K)Y.zoKoqayL}$O6EY}Q+g',
+      ];
+    $res = $test->request($req);
+    ok( !$res->is_success,
+        "Validate some bad data against arrayref-based rules FAILS" );
+    is $res->code, 500, "... with a 500 response code";
+
+    cmp_deeply $trap->read,
+      [
+        superhashof(
+            {
+                level   => "error",
+                message => re(qr/rules option reference type ARRAY not allowed/)
+            }
+        )
+      ],
+      "... and we got error message showing bad ARRAY."
 };
 
 $test = Plack::Test->create( TestAppNoErrorsJoined->to_app );

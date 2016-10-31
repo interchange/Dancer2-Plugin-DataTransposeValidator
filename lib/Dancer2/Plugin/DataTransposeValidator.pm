@@ -110,7 +110,7 @@ sub validator {
         $rules = $plugin->rules->{$name}->(@additional_args);
     }
     elsif (ref($name) eq 'HASH') {
-        $rules = sub { $name };
+        $rules = $name;
     }
     elsif (ref($name) eq 'CODE') {
         $rules = $name->(@additional_args);
