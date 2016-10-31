@@ -1,5 +1,9 @@
 Revision history for Dancer::Plugin::DataTransposeValidator
 
+0.101 Mon 31 Oct 12:22:02 CET 2016
+
+    * Fix various issues spotted by CI
+
 0.100 Mon 31 Oct 11:11:06 CET 2016
 
     * Rules can now be configured in a class instead of eval'ed files.
