@@ -86,7 +86,7 @@ sub validator {
         if ( !$plugin->rules->{$name} ) {
             if ( my $class = $plugin->rules_class ) {
                 if ( $class->can($name) ) {
-                    $plugin->rules->{$name} = \&{"$class::$name"};
+                    $plugin->rules->{$name} = \&{"${class}::$name"};
                 }
                 else {
                     croak "Rules class \"$class\" has no rule sub named: $name";
