@@ -97,7 +97,9 @@ sub validator {
                 my $path = path( $plugin->rules_dir )->child($name);
                 croak "rules_file does not exist" unless $path->is_file;
 
-                my $eval = do $path or croak "bad rules file: $path - $! $@";
+                my $eval = do $path->absolute
+                  or croak "bad rules file: $path - $! $@";
+
                 if ( ref($eval) eq 'CODE' ) {
                     $plugin->rules->{$name} = $eval;
                 }
