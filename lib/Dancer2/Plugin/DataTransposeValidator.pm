@@ -17,11 +17,11 @@ Dancer2::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for 
 
 =head1 VERSION
 
-Version 0.101
+Version 0.200
 
 =cut
 
-our $VERSION = '0.101';
+our $VERSION = '0.200';
 
 has css_error_class => (
     is          => 'ro',
