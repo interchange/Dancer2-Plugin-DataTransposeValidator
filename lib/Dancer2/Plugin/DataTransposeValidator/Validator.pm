@@ -1,7 +1,7 @@
 package Dancer2::Plugin::DataTransposeValidator::Validator;
 
 use Moo;
-use Dancer2::Core::Types qw(Bool Dict Enum HashRef InstanceOf Maybe Str Undef);
+use Dancer2::Core::Types qw(Bool Dict Enum HashRef InstanceOf Maybe Str);
 use Data::Transpose::Validator;
 use namespace::clean;
 
@@ -80,7 +80,7 @@ L<Dancer2::Plugin::DataTransposeValidator/errors_hash>.
 
 has errors_hash => (
     is       => 'ro',
-    isa      => Enum [qw/arrayref joined/] | Undef,
+    isa      => Maybe [ Enum [qw/arrayref joined/] ],
     required => 1,
 );
 
