@@ -11,11 +11,11 @@ Dancer2::Plugin::DataTransposeValidator::Validator
 
 =head1 VERSION
 
-Version 0.200
+Version 0.201
 
 =cut
 
-our $VERSION = '0.200';
+our $VERSION = '0.201';
 
 =head1 CONSTRUCTOR ARGS
 

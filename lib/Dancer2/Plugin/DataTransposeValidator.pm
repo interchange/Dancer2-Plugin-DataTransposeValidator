@@ -9,7 +9,7 @@ use Dancer2::Plugin::DataTransposeValidator::Validator;
 use Path::Tiny;
 use Module::Runtime qw/use_module/;
 
-use Dancer2::Plugin 0.200000;
+use Dancer2::Plugin 0.205000;
 
 =head1 NAME
 
@@ -17,11 +17,11 @@ Dancer2::Plugin::DataTransposeValidator - Data::Transpose::Validator plugin for 
 
 =head1 VERSION
 
-Version 0.200
+Version 0.201
 
 =cut
 
-our $VERSION = '0.200';
+our $VERSION = '0.201';
 
 has css_error_class => (
     is          => 'ro',
