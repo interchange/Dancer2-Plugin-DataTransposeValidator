@@ -10,6 +10,7 @@ WriteMakefile(
         : () ),
     MIN_PERL_VERSION => '5.010000',
     BUILD_REQUIRES   => {
+        'aliased'               => 0,
         'Email::Valid'          => 0,
         'HTTP::Request::Common' => 0,
         'JSON::MaybeXS'         => 0,
