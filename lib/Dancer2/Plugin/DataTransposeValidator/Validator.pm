@@ -177,7 +177,7 @@ has errors => (
         return {} if $self->valid;
 
         my $errors_hash = $self->errors_hash || '';
-        my $ret;
+        my $ret = {};
         my $dtv_errors = $self->_dtv->errors_hash;
         while ( my ( $key, $value ) = each %$dtv_errors ) {
             my @errors = map { $_->{value} } @{$value};
